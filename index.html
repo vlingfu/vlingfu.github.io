@@ -1,23 +1,55 @@
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta name="google" value="notranslate">
-    <meta name="apple-mobile-web-app-title" content="John Doe">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#36534e">
-    <base href="/">
-    <title>Hexo</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/favicon.ico">
-    
-    <link href="styles.073d77000636fd0bc426.bundle.css" rel="stylesheet">
-  </head>
-<body>
-  <is-root></is-root>
-  <script src="inline.9faad2dd9cf1e413d5b0.bundle.js"></script><script src="polyfills.2d8c615085672eb259db.bundle.js"></script><script src="main.9115ab25e251967a6b58.bundle.js"></script>
-  
-</body>
-</html>
+extends base
+
+block title
+  if config.subtitle
+    title= config.title + ' | ' + config.subtitle
+  else
+    title= config.title
+
+block content
+  for post in page.posts.toArray()
+    .post
+      h1.post-title
+        include _partial/helpers.pug
+        a(href=url_for(post.path))
+          +title(post)
+      .post-meta= post.date.format(config.date_format)
+      if theme.disqus
+        a.disqus-comment-count(data-disqus-identifier=post.path, href=url_for(post.path) + '#disqus_thread')
+      if theme.changyan
+        a.ds-thread-count(href=url_for(post.path) + '#SOHUCS')
+          span.cy_cmt_count(id='sourceId::' + post.date.valueOf() style='margin: 0 3px 0 1px;') 0
+          span= ' ' + __('Comment')
+      if post.description
+        .post-content
+          != post.description
+      else if post.excerpt
+        .post-content
+          != post.excerpt
+      else if post.content
+        - var br = 0
+        - for (var i = 0; i < 5; ++i) {
+          - br = post.content.indexOf('\n',br+1)
+          if br<0
+            - break
+          if br >150
+            - break
+        - }
+        if br < 0
+          .post-content
+            != post.content
+        else
+          .post-content
+            != post.content.substring(0, br)
+      p(class='readmore')
+        a(href=url_for(post.path))= __('Readmore')
+
+  include _partial/paginator.pug
+  if theme.disqus
+    script(id='dsq-count-scr', src='//'+ theme.disqus + '.disqus.com/count.js', async)
+  if theme.changyan
+    script#cy_cmt_num(src='https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cyt4LaybM', async)
+  if config.mathjax
+    include _partial/mathjax.pug
+  if config.mathjax2
+    include _partial/mathjax2.pug

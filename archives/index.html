@@ -1,23 +1,24 @@
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta name="google" value="notranslate">
-    <meta name="apple-mobile-web-app-title" content="John Doe">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#36534e">
-    <base href="/">
-    <title>Archives - Hexo</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/favicon.ico">
-    
-    <link href="styles.073d77000636fd0bc426.bundle.css" rel="stylesheet">
-  </head>
-<body>
-  <is-root></is-root>
-  <script src="inline.9faad2dd9cf1e413d5b0.bundle.js"></script><script src="polyfills.2d8c615085672eb259db.bundle.js"></script><script src="main.9115ab25e251967a6b58.bundle.js"></script>
-  
-</body>
-</html>
+extends base
+
+block title
+  if page.category
+     title= page.category + ' | ' + config.title
+  if page.tag
+     title= page.tag + ' | ' + config.title
+  if page.archive
+     title= __('archive') + ' | ' + config.title
+block content
+  if page.category || page.tag
+      h1.label-title=  __('reading_label', page.category || page.tag)
+  .post
+    .post-archive
+        //Use lodash to classify posts. See https://lodash.com/docs#groupBy
+        each posts, year in _.groupBy(page.posts.toArray(), function(p){return -p.date.format('YYYY')})
+          h2= -year
+          ul.listing
+            for post in posts
+              li
+                span.date= post.date.format('YYYY/MM/DD')
+                a(href=url_for(post.path), title=post.title)
+                  +title(post)
+  include _partial/paginator.pug
